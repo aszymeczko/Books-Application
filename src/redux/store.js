@@ -1,28 +1,19 @@
-import { createStore } from 'redux';
-import shortid from 'shortid';
+import {combineReducers, createStore, applyMiddleware, compose} from 'redux';
+import {thunk} from "redux-thunk";
+import initialState from "./initialState";
+import booksReducer from "./booksRedux";
 
-const reducer = (state, action) => {
-    switch (action.type) {
-        case 'REMOVE_BOOK':
-            return { ...state, books: state.books.filter(book => book.id !== action.payload) };
-        case 'ADD_BOOK':
-            return { ...state, books: [...state.books, { ...action.payload, id: shortid() }] }
-        default:
-            return state;
-    }
-};
-
-const initialState = {
-    books: [
-        { id: 1, title: 'Dwór cierni i róż', author: 'Maas Sarah J.' },
-        { id: 2, title: 'Rozdroże kruków', author: 'Andrzej Sapkowski' }
-    ]
-};
+const reducer = combineReducers({
+    books: booksReducer
+});
 
 const store = createStore(
     reducer,
     initialState,
-    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+    compose(
+        applyMiddleware(thunk),
+        window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+    )
 );
 
 export default store;
